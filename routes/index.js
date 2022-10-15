@@ -1,9 +1,7 @@
-var express = require('express');
-var router = express.Router();
+import express from "express";
+export let router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.status(200).json("Welcome to the Food Order API.")
 });
-
-module.exports = router;
