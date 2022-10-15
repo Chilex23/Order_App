@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "start": "node ./bin/www",
-    "dev": "DEBUG=order-app:* MONGO_URL=mongodb://172.19.80.1:27017/orderapp JWT_SECRET=mysupersecret JWT_EXPIRES_IN=30d nodemon ./bin/www"
+    "dev": "nodemon ./bin/www"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "dotenv": "^16.0.3",
     "express": "~4.16.1",
     "express-session": "^1.17.3",
     "hbs": "^4.2.0",

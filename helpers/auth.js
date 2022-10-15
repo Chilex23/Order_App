@@ -8,3 +8,14 @@ export const signToken = (body) => {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
+
+export const getToken = (req) => {
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+  return token;
+};

@@ -1,7 +1,7 @@
 import express from "express";
 import passport from "passport";
 import { signToken } from "../helpers/auth.js";
-import { signUpController } from "../controllers/auth.js";
+// import { signUpController } from "../controllers/auth.js";
 
 export const router = express.Router();
 

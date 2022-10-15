@@ -1,4 +1,7 @@
 import createError from "http-errors";
+import * as dotenv from "dotenv";
+dotenv.config()
+
 import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
@@ -11,6 +14,7 @@ import { router as indexRouter } from "./routes/index.js";
 import { router as foodRouter } from "./routes/food.js";
 import { router as authRouter } from "./routes/auth.js";
 import { router as userRouter } from "./routes/users.js";
+import { router as orderRouter } from "./routes/orders.js";
 import DBG from "debug";
 
 const debug = DBG("orderApp:debug");
@@ -38,6 +42,11 @@ app.use(
   "/api/users",
   passport.authenticate("jwt", { session: false }),
   userRouter
+);
+app.use(
+  "/api/orders",
+  passport.authenticate("jwt", { session: false }),
+  orderRouter
 );
 
 process.on("uncaughtException", function (err) {
