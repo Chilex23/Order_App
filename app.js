@@ -35,7 +35,7 @@ app.use("/api", indexRouter);
 app.use("/api/food", foodRouter);
 app.use("/api/auth", authRouter);
 app.use(
-  "/api/user",
+  "/api/users",
   passport.authenticate("jwt", { session: false }),
   userRouter
 );
