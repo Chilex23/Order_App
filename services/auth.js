@@ -14,6 +14,11 @@ export const SignUpUser = async (userBody, next) => {
   }
 };
 
+export const findUserById = async (id) => {
+  const user = await User.findById(id);
+  return user;
+}
+
 export const createAuthToken = (id) => {
   return signToken(id);
 };

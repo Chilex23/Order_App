@@ -1,5 +1,6 @@
 import express from "express";
 import { getToken } from "../helpers/auth.js";
+import { changeUserPassword, checkAvailableUsername, updateUserProfile } from "../controllers/users.js";
 export const router = express.Router();
 
 router.get("/profile", (req, res, next) => {
@@ -12,3 +13,7 @@ router.get("/profile", (req, res, next) => {
     token: token,
   });
 });
+
+router.post("/update_password", changeUserPassword);
+router.post("/check_username", checkAvailableUsername);
+router.post("/update_profile", updateUserProfile);

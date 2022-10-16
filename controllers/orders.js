@@ -9,7 +9,7 @@ export const createOrderController = async (req, res, next) => {
     return res.status(400).json({ message: validationResult.error.message });
   }
   console.log(token);
-
+  console.log("user", req.user);
   const newOrder = await createOrder(req.body, next);
   return res.status(200).json({
     message: "Order created successfully",

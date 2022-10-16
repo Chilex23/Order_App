@@ -1,6 +1,6 @@
 import createError from "http-errors";
 import * as dotenv from "dotenv";
-dotenv.config()
+dotenv.config();
 
 import express from "express";
 import path from "path";
@@ -36,7 +36,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/api", indexRouter);
-app.use("/api/food", foodRouter);
+app.use(
+  "/api/food",
+  passport.authenticate("jwt", { session: false }),
+  foodRouter
+);
 app.use("/api/auth", authRouter);
 app.use(
   "/api/users",
