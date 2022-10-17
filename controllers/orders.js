@@ -1,4 +1,4 @@
-import { createOrder, getOrders } from "../services/orders.js";
+import { createOrder, getOrders, deleteOrder } from "../services/orders.js";
 import { getToken } from "../helpers/auth.js";
 import { createOrderValidator } from "../validators/orders.js";
 
@@ -22,6 +22,7 @@ export const getUserOrderController = async (req, res, next) => {
   try {
     let pageNo = req.query.page;
     let user = req.params.id;
+    console.log(req.user);
     // console.log(pageNo);
     const { orders, totalOrders, currentPage, totalPages } = await getOrders(
       pageNo,
@@ -29,12 +30,28 @@ export const getUserOrderController = async (req, res, next) => {
       next
     );
     if (!orders || orders.length == 0)
-      return res.status(400).json({ message: "Bad Request" });
+      return res
+        .status(400)
+        .json({ message: "Bad Request, check the username or the page No." });
     return res
       .status(200)
       .json({ orders, totalOrders, currentPage, totalPages });
   } catch (e) {
-    console.log("order", e);
+    console.log("get order error", e);
+    next(e);
+  }
+};
+
+export const deleteOrderController = async (req, res, next) => {
+  try {
+    let id = req.query.id;
+    let { username } = req.user;
+    console.log(req.user);
+    if (await deleteOrder(username, id, next))
+      return res.status(200).json({ message: "Deleted successfully" });
+    else return res.status(400).json({ message: "Bad request" });
+  } catch (e) {
+    console.log("delete order error", e);
     next(e);
   }
 };

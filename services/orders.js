@@ -33,3 +33,16 @@ export const getOrders = async (pageNo, user, next) => {
     next(e);
   }
 };
+
+export const deleteOrder = async (user, id, next) => {
+  try {
+    const filter = user ? { created_by: user,  _id: id } : {_id: id};
+    const order = await Order.deleteOne(filter);
+    console.log("delete order", order);
+    return true;
+  } catch(e) {
+    console.log("Error deleting order", e);
+    next(e);
+  }
+
+}
