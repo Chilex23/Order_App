@@ -6,3 +6,10 @@ export const createOrderValidator = (body) => {
   });
   return schema.validate(body);
 };
+
+export const deliverOrderValidator = (body) => {
+  const schema = Joi.object().keys({
+    state: Joi.number().required()
+  })
+  return schema.validate(body);
+}

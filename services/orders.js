@@ -20,14 +20,16 @@ export const createOrder = async (body, user, next) => {
   }
 };
 
-export const getOrders = async (pageNo, user, next) => {
+export const getOrders = async (pageNo, user, sortFormat, next) => {
   try {
     const filter = user ? { created_by: user } : {};
+    const sort =
+      sortFormat == "price" ? { total_price: "desc" } : { order_date: "desc" };
     let currentPage = Number(pageNo) || 1;
     const ORDERS_PER_PAGE = 10;
     let start = (pageNo - 1) * ORDERS_PER_PAGE;
     let end = start + ORDERS_PER_PAGE;
-    const selection = await Order.find(filter).sort({ order_date: "desc" });
+    const selection = await Order.find(filter).sort(sort);
     let totalOrders = selection.length;
     let totalPages = Math.ceil(totalOrders / ORDERS_PER_PAGE);
     let orders = selection.slice(start, end);
@@ -58,6 +60,19 @@ export const getOrder = async (id, user, next) => {
     return order;
   } catch (e) {
     console.log("Error getting order", e);
+    next(e);
+  }
+};
+
+export const updateOrder = async (id, user, state, next) => {
+  try {
+    const filter = user ? { created_by: user, _id: id } : { _id: id };
+    console.log(filter);
+    await Order.findByIdAndUpdate(filter, { $set: { state } });
+    return true;
+  } catch (e) {
+    e.status = 400;
+    e.message = "Order was not found";
     next(e);
   }
 };
