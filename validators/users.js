@@ -6,6 +6,7 @@ export const signUpValidator = (body) => {
     username: Joi.string().required(),
     password: Joi.string().required().min(8),
     email: Joi.string().required().email(),
+    role: Joi.string()
   });
   return schema.validate(body);
 };

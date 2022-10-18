@@ -21,8 +21,8 @@ passport.use(
       try {
         const validateResult = signUpValidator(req.body);
         if (validateResult.error) {
-          console.log("Bad request signing up user");
-          return done(null, false, validateResult.error.message);
+          console.log("Bad request signing up user", validateResult.error.message);
+          return done(null, false, { message: validateResult.error.message });
         }
         const user = await User.create(req.body);
         console.log("user created", user);
@@ -48,7 +48,7 @@ passport.use(
         const user = await User.findOne({ username });
         // console.log(user)
         if (!user) {
-          return done(null, false, { message: "User not found" });
+          return done(null, false, { message: "User not found, check the username provided." });
         }
 
         const validate = await user.validatePassword(password);

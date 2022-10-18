@@ -6,7 +6,7 @@ const food = new Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   imageLink: { type: String },
-  dateAdded: { type: Date, default: Date.now },
+  dateAdded: { type: Date, default: Date.now() },
   price: { type: Number, required: true },
 });
 
