@@ -26,7 +26,7 @@ export const updateUserPassword = async (
 
 export const checkUsername = async (username) => {
   const user = await User.findOne({ username });
-  // console.log(user);
+  //console.log(user);
   if (!user) {
     // username is taken
     return true;

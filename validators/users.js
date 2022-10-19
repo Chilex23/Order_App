@@ -6,14 +6,21 @@ export const signUpValidator = (body) => {
     username: Joi.string().required(),
     password: Joi.string().required().min(8),
     email: Joi.string().required().email(),
-    role: Joi.string()
+    role: Joi.string(),
+  });
+  return schema.validate(body);
+};
+
+export const loginValidator = (body) => {
+  const schema = Joi.object().keys({
+    username: Joi.string().required(),
+    password: Joi.string().required(),
   });
   return schema.validate(body);
 };
 
 export const updatePasswordValidator = (body) => {
   const schema = Joi.object().keys({
-    username: Joi.string().required(),
     oldPassword: Joi.string().required(),
     newPassword: Joi.string().required().min(8),
   });

@@ -1,8 +1,14 @@
 import express from "express";
+import passport from "passport";
 import { getToken } from "../helpers/auth.js";
-import { changeUserPassword, checkAvailableUsername, updateUserProfile } from "../controllers/users.js";
+import {
+  changeUserPassword,
+  checkAvailableUsername,
+  updateUserProfile,
+} from "../controllers/users.js";
 export const router = express.Router();
 
+router.use(passport.authenticate("jwt", { session: false }));
 router.get("/profile", (req, res, next) => {
   const token = getToken(req);
   console.log(token);

@@ -61,7 +61,7 @@ export const getUserOrdersController = async (req, res, next) => {
       .status(200)
       .json({ orders, totalOrders, currentPage, totalPages, success: false });
   } catch (e) {
-    console.log("get order error", e);
+    console.log("get orders error", e);
     next(e);
   }
 };

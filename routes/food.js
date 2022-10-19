@@ -1,4 +1,6 @@
 import express from "express";
+import passport from "passport";
+import { restrictTo } from "../middleware/auth.js";
 import {
   addFoodController,
   updateFoodController,
@@ -8,7 +10,8 @@ import {
 
 export let router = express.Router();
 
-router.get("/", getAllFoodController);
-router.post("/add", addFoodController);
-router.post("/update/:id", updateFoodController);
-router.delete("/delete", deleteFoodController);
+router.use(passport.authenticate("jwt", { session: false }));
+router.get("/", restrictTo("Admin"), getAllFoodController);
+router.post("/add", restrictTo("Admin"), addFoodController);
+router.post("/update/:id", restrictTo("Admin"), updateFoodController);
+router.delete("/delete", restrictTo("Admin"), deleteFoodController);

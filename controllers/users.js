@@ -1,4 +1,7 @@
-import { updatePasswordValidator, updateProfileValidator } from "../validators/users.js";
+import {
+  updatePasswordValidator,
+  updateProfileValidator,
+} from "../validators/users.js";
 import {
   updateUserPassword,
   updateUserDetails,
@@ -8,7 +11,9 @@ import {
 export const updateUserProfile = async (req, res, next) => {
   const validateResult = updateProfileValidator(req.body);
   if (validateResult.error) {
-    return res.status(400).json({ message: validateResult.error.message });
+    return res
+      .status(400)
+      .json({ message: validateResult.error.message, success: false });
   }
   try {
     const { username } = req.user;
@@ -18,7 +23,7 @@ export const updateUserProfile = async (req, res, next) => {
     await updateUserDetails(username, req.body);
     return res
       .status(200)
-      .json({ status: "success", message: "User updated successfully" });
+      .json({ message: "User updated successfully", success: true });
   } catch (e) {
     console.log("error", e);
     next(e);
@@ -28,18 +33,22 @@ export const updateUserProfile = async (req, res, next) => {
 export const changeUserPassword = async (req, res, next) => {
   const validateResult = updatePasswordValidator(req.body);
   if (validateResult.error) {
-    return res.status(400).json({ message: validateResult.error.message });
+    return res
+      .status(400)
+      .json({ message: validateResult.error.message, success: false });
   }
   const { username } = req.user;
   //   console.log("user", req.user);
   const { oldPassword, newPassword } = req.body;
   try {
-    if (await updateUserPassword(username, oldPassword, newPassword, res)) {
+    if (await updateUserPassword(username, oldPassword, newPassword)) {
       return res
         .status(200)
-        .json({ status: "success", message: "Password updated successfully" });
+        .json({ message: "Password updated successfully", success: true });
     } else {
-      return res.status(401).send({ message: "Incorrect password" });
+      return res
+        .status(401)
+        .send({ message: "Incorrect password", success: false });
     }
   } catch (e) {
     console.log("error", e);
@@ -51,9 +60,13 @@ export const checkAvailableUsername = async (req, res, next) => {
   const { username } = req.body;
   try {
     if (await checkUsername(username)) {
-      return res.status(200).json({ message: "Username is available" });
+      return res
+        .status(200)
+        .json({ message: "Username is available", success: true });
     } else {
-      return res.status(200).json({ message: "Username is not available" });
+      return res
+        .status(200)
+        .json({ message: "Username is not available", success: false });
     }
   } catch (e) {
     console.log("error", e);

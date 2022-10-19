@@ -5,7 +5,6 @@ dotenv.config();
 import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
-import passport from "passport";
 import util from "util";
 import "./config/db.js";
 import "./middleware/auth.js";
@@ -36,29 +35,19 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/api", indexRouter);
-app.use(
-  "/api/food",
-  passport.authenticate("jwt", { session: false }),
-  foodRouter
-);
+app.use("/api/food", foodRouter);
 app.use("/api/auth", authRouter);
-app.use(
-  "/api/users",
-  passport.authenticate("jwt", { session: false }),
-  userRouter
-);
-app.use(
-  "/api/orders",
-  passport.authenticate("jwt", { session: false }),
-  orderRouter
-);
+app.use("/api/users", userRouter);
+app.use("/api/orders", orderRouter);
 
 process.on("uncaughtException", function (err) {
-  error("I've crashed !!! - " + (err.stack || err));
+  // error("I've crashed !!! - " + (err.stack || err));
+  console.error("I've crashed !!! - " + (err.stack || err));
 });
 
 process.on("unhandledRejection", (reason, p) => {
-  error(`Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`);
+  // error(`Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`);
+  console.error(`Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`);
 });
 
 // catch 404 and forward to error handler
