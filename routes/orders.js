@@ -17,4 +17,4 @@ router.get("/all", restrictTo("Admin"), getAllOrderController);
 router.post("/create", createOrderController);
 router.get("/:id", getUserOrdersController);
 router.delete("/delete", deleteOrderController);
-router.post("/deliver/:id", deliveredOrderController);
+router.patch("/deliver/:id", deliveredOrderController);

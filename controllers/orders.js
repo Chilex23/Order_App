@@ -95,17 +95,15 @@ export const getAllOrderController = async (req, res, next) => {
 export const getOrderController = async (req, res, next) => {
   try {
     let id = req.query.id;
-    let { username } = req.user;
-    let order;
-    if (req.user.role === "Admin") {
-      order = await getOrder(id, null);
-    } else {
-      order = await getOrder(id, username);
-    }
+    let { username, role } = req.user;
+    let order = await getOrder(id, username, role);
     if (!order)
       return res
         .status(404)
-        .json({ message: "Order not found", success: false });
+        .json({
+          message: "Order not found, you are not permitted to view this order",
+          success: false,
+        });
 
     return res.status(200).json({ data: order, success: true });
   } catch (e) {
@@ -142,15 +140,20 @@ export const deleteOrderController = async (req, res, next) => {
 export const deliveredOrderController = async (req, res, next) => {
   try {
     const { state } = req.body;
-    const { username } = req.user;
+    const { username, role } = req.user;
     const { id } = req.params;
     const validationResult = deliverOrderValidator(req.body);
     if (validationResult.error)
       return res
         .status(400)
         .json({ message: validationResult.error.message, success: false });
-    if (await updateOrder(id, username, state, next))
+    if (await updateOrder(id, username, role, state))
       return res.status(200).json({ message: "Delivered", success: true });
+    else
+      return res.status(401).json({
+        message: "You are not permitted since this is not your order",
+        success: false,
+      });
   } catch (e) {
     next(e);
   }

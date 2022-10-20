@@ -54,9 +54,9 @@ export const deleteOrder = async (user, id) => {
   }
 };
 
-export const getOrder = async (id, user) => {
+export const getOrder = async (id, user, role) => {
   try {
-    const filter = user ? { ordered_by: user, _id: id } : { _id: id };
+    const filter = user && role === "User" ? { ordered_by: user, _id: id } : { _id: id };
     const order = await Order.findOne(filter);
     // console.log("Get order", order);
     return order;
@@ -68,15 +68,14 @@ export const getOrder = async (id, user) => {
   }
 };
 
-export const updateOrder = async (id, user, state, next) => {
+export const updateOrder = async (id, user, role, state) => {
   try {
-    const filter = user ? { ordered_by: user, _id: id } : { _id: id };
-    console.log(filter);
-    await Order.findByIdAndUpdate(filter, { $set: { state } });
-    return true;
+    const filter = user && role === "User" ? { ordered_by: user, _id: id } : { _id: id };
+    const order = await Order.findOneAndUpdate(filter, { $set: { state } });
+    return order;
   } catch (e) {
     e.status = 400;
     e.message = "Order was not found";
-    next(e);
+    throw e;
   }
 };
