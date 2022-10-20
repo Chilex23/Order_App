@@ -31,6 +31,7 @@ export const updateProfileValidator = (body) => {
   const schema = Joi.object().keys({
     username: Joi.string(),
     name: Joi.string(),
+    email: Joi.string().email(),
     imageLink: Joi.string(),
   });
   return schema.validate(body);

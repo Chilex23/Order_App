@@ -57,15 +57,16 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-  error(`APP ERROR HANDLER ${err.stack}`);
+  console.error(`APP ERROR HANDLER ${err.stack}`);
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
 
-  error((err.status || 500) + " " + err.message);
-  // render the error page
-  res.status(err.status || 500);
-  res.render("error");
+  console.error((err.status || 500) + " " + err.message);
+  return res
+    .status(err.status || 500)
+    .json({ message: err.message, success: false });
+  //res.render("error");
 });
 
 export default app;

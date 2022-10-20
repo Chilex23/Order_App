@@ -21,10 +21,8 @@ export const createOrderController = async (req, res, next) => {
   } else if (req.body.items.length == 0) {
     return res
       .status(400)
-      .json({ message: "Items must contain an object", success: false });
+      .json({ message: "Items Array must contain an object", success: false });
   }
-  console.log(token);
-  console.log("user", req.user);
   try {
     const { username } = req.user;
     const newOrder = await createOrder(req.body, username, next);
@@ -52,6 +50,11 @@ export const getUserOrdersController = async (req, res, next) => {
       sortFormat,
       next
     );
+    // Only users can view their orders
+    if (req.user.username !== user)
+      return res
+        .status(401)
+        .json({ message: "You can't view", success: false });
     if (!orders || orders.length == 0)
       return res.status(400).json({
         message: "Bad Request, check the username or the query parameter page.",
@@ -59,9 +62,32 @@ export const getUserOrdersController = async (req, res, next) => {
       });
     return res
       .status(200)
-      .json({ orders, totalOrders, currentPage, totalPages, success: false });
+      .json({ orders, totalOrders, currentPage, totalPages, success: true });
   } catch (e) {
     console.log("get orders error", e);
+    next(e);
+  }
+};
+
+export const getAllOrderController = async (req, res, next) => {
+  try {
+    let pageNo = req.query.page;
+    let sortFormat = req.query.sort;
+    const { orders, totalOrders, currentPage, totalPages } = await getOrders(
+      pageNo,
+      null,
+      sortFormat,
+      next
+    );
+    if (!orders || orders.length == 0)
+      return res.status(400).json({
+        message: "Bad Request, No query parameter for page.",
+        success: false,
+      });
+    return res
+      .status(200)
+      .json({ orders, totalOrders, currentPage, totalPages, success: true });
+  } catch (e) {
     next(e);
   }
 };
@@ -70,11 +96,17 @@ export const getOrderController = async (req, res, next) => {
   try {
     let id = req.query.id;
     let { username } = req.user;
-    let order = await getOrder(id, username, next);
+    let order;
+    if (req.user.role === "Admin") {
+      order = await getOrder(id, null);
+    } else {
+      order = await getOrder(id, username);
+    }
     if (!order)
       return res
         .status(404)
         .json({ message: "Order not found", success: false });
+
     return res.status(200).json({ data: order, success: true });
   } catch (e) {
     console.log("Get order controller error", e);
@@ -85,14 +117,22 @@ export const getOrderController = async (req, res, next) => {
 export const deleteOrderController = async (req, res, next) => {
   try {
     let id = req.query.id;
+    if (!id)
+      return res.status(400).json({
+        message: "Provide the order ID as a query paramter",
+        success: false,
+      });
     let { username } = req.user;
-    console.log(req.user);
-    if (await deleteOrder(username, id, next))
-      return res
-        .status(200)
-        .json({ message: "Deleted successfully", success: true });
-    else
-      return res.status(400).json({ message: "Bad request", success: false });
+    if (req.user.role === "Admin") {
+      // console.log(req.user);
+      await deleteOrder(null, id);
+    } else {
+      // console.log(req.user);
+      await deleteOrder(username, id);
+    }
+    return res
+      .status(200)
+      .json({ message: "Deleted successfully", success: true });
   } catch (e) {
     console.log("delete order error", e);
     next(e);

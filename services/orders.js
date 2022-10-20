@@ -22,7 +22,7 @@ export const createOrder = async (body, user, next) => {
 
 export const getOrders = async (pageNo, user, sortFormat, next) => {
   try {
-    const filter = user ? { created_by: user } : {};
+    const filter = user ? { ordered_by: user } : {};
     const sort =
       sortFormat == "price" ? { total_price: "desc" } : { order_date: "desc" };
     let currentPage = Number(pageNo) || 1;
@@ -40,33 +40,37 @@ export const getOrders = async (pageNo, user, sortFormat, next) => {
   }
 };
 
-export const deleteOrder = async (user, id, next) => {
+export const deleteOrder = async (user, id) => {
   try {
     const filter = user ? { created_by: user, _id: id } : { _id: id };
     const order = await Order.deleteOne(filter);
     console.log("delete order", order);
-    return true;
+    return order.acknowledged;
   } catch (e) {
-    console.log("Error deleting order", e);
-    next(e);
+    // console.log("Error deleting order", e);
+    e.message = "Order ID is incorrect";
+    e.status = 400;
+    throw e;
   }
 };
 
-export const getOrder = async (id, user, next) => {
+export const getOrder = async (id, user) => {
   try {
-    const filter = user ? { created_by: user, _id: id } : { _id: id };
-    const order = await Order.findById(filter);
+    const filter = user ? { ordered_by: user, _id: id } : { _id: id };
+    const order = await Order.findOne(filter);
     // console.log("Get order", order);
     return order;
   } catch (e) {
     console.log("Error getting order", e);
-    next(e);
+    e.message = "The Order ID query parameter is wrong or undefined";
+    e.status = 400;
+    throw e;
   }
 };
 
 export const updateOrder = async (id, user, state, next) => {
   try {
-    const filter = user ? { created_by: user, _id: id } : { _id: id };
+    const filter = user ? { ordered_by: user, _id: id } : { _id: id };
     console.log(filter);
     await Order.findByIdAndUpdate(filter, { $set: { state } });
     return true;

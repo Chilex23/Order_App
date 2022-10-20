@@ -50,7 +50,7 @@ export const updateFoodController = async (req, res, next) => {
       error.status = 400;
       throw error;
     }
-    return res.status(200).json({ message: "success", success: data });
+    return res.status(200).json({ data, success: true});
   } catch (e) {
     next(e);
   }

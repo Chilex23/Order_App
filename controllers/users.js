@@ -17,13 +17,15 @@ export const updateUserProfile = async (req, res, next) => {
   }
   try {
     const { username } = req.user;
-    // if (!(await checkUsername(req.body.username))) {
-    //   return res.status(400).json({ message: "Username is not available" });
-    // }
-    await updateUserDetails(username, req.body);
-    return res
-      .status(200)
-      .json({ message: "User updated successfully", success: true });
+    if (req.body.username) {
+      if (!(await checkUsername(req.body.username)) && req.body.username !== username ) {
+        return res.status(400).json({ message: "Username is not available", success: false });
+      }
+      await updateUserDetails(username, req.body);
+      return res
+        .status(200)
+        .json({ message: "User updated successfully", success: true });
+    }
   } catch (e) {
     console.log("error", e);
     next(e);
