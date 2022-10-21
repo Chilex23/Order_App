@@ -2,14 +2,15 @@ import mongoose from "mongoose";
 
 const { Schema, model } = mongoose;
 
-const food = new Schema({
+const FoodSchema = new Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   imageLink: { type: String },
   dateAdded: { type: Date, default: Date.now() },
   price: { type: Number, required: true },
+  reviews: [{ reviewer: String, rating: Number, comment: String }],
 });
 
-const Food = model("Food", food);
+const Food = model("Food", FoodSchema);
 
 export default Food;
