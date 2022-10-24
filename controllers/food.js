@@ -6,11 +6,13 @@ import {
 import {
   addFood,
   getAllFood,
+  getFood,
   editFood,
   deleteFood,
   addReview,
   updateReview,
   getReviews,
+  deleteReview,
 } from "../services/food.js";
 import DBG from "debug";
 
@@ -39,8 +41,31 @@ export const addFoodController = async (req, res, next) => {
 
 export const getAllFoodController = async (req, res, next) => {
   try {
-    const allFood = await getAllFood(next);
-    return res.status(200).json({ data: allFood, success: true });
+    let pageNo = req.query.page;
+    const { foodItems, totalFoodItems, currentPage, totalPages } =
+      await getAllFood(pageNo, next);
+    if (!foodItems || foodItems.length == 0)
+      return res.status(400).json({
+        message: "Bad Request, No query parameter for page.",
+        success: false,
+      });
+    return res.status(200).json({
+      foodItems,
+      totalFoodItems,
+      currentPage,
+      totalPages,
+      success: true,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+export const getFoodController = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const food = await getFood(id);
+    return res.status(200).json({ data: food, success: true });
   } catch (e) {
     next(e);
   }
@@ -69,7 +94,7 @@ export const updateFoodController = async (req, res, next) => {
 
 export const deleteFoodController = async (req, res, next) => {
   try {
-    let id = req.query.id;
+    let { id } = req.params;
     if (await deleteFood(id, next))
       return res
         .status(200)
@@ -128,6 +153,17 @@ export const getReviewsContoller = async (req, res, next) => {
     res.status(200).json({ data: reviews, success: true });
   } catch (e) {
     console.log("get all reviews for a food error", e);
+    next(e);
+  }
+};
+
+export const deleteReviewController = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = req.user.username || req.body.username;
+    if (await deleteReview(id, user))
+      res.status(200).json({ message: "Review delete", success: true });
+  } catch (e) {
     next(e);
   }
 };

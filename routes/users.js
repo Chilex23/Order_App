@@ -20,6 +20,6 @@ router.get("/profile", (req, res, next) => {
   });
 });
 
-router.post("/update_password", changeUserPassword);
-router.post("/check_username", checkAvailableUsername);
-router.post("/update_profile", updateUserProfile);
+router.post("/update-password", changeUserPassword);
+router.post("/check-username", checkAvailableUsername);
+router.post("/update-profile", updateUserProfile);

@@ -20,7 +20,7 @@ export const updateFoodValidator = (body) => {
 
 export const addReviewValidator = (body) => {
   const schema = Joi.object().keys({
-    reviewer: Joi.string().required(),
+    // reviewer: Joi.string().required(),
     rating: Joi.number().required(),
     comment: Joi.string().required(),
   });
