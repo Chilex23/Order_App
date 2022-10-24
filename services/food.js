@@ -121,6 +121,11 @@ export const updateReview = async (id, user, body) => {
 export const getReviews = async (id) => {
   try {
     const food = await Food.findById(id);
+    if (!food) {
+      const error = new Error("No reviews found for this food item.")
+      error.status = 400;
+      throw error;
+    }
     return food.reviews;
   } catch (e) {
     throw e;
