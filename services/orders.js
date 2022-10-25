@@ -2,7 +2,6 @@ import Order from "../models/orders.js";
 
 export const createOrder = async (body, user, next) => {
   try {
-    console.log(body);
     const { items } = body;
     let total_price = items.reduce(
       (acc, el) => acc + el.price * el.quantity,
@@ -32,6 +31,11 @@ export const getOrders = async (pageNo, user, sortFormat, next) => {
     const selection = await Order.find(filter).sort(sort);
     let totalOrders = selection.length;
     let totalPages = Math.ceil(totalOrders / ORDERS_PER_PAGE);
+    if (currentPage > totalPages) {
+      let error = new Error("Page no is out of range.")
+      error.status = 400;
+      throw error;
+    }
     let orders = selection.slice(start, end);
     return { orders, totalOrders, currentPage, totalPages };
   } catch (e) {
@@ -48,7 +52,7 @@ export const deleteOrder = async (user, id) => {
     return order.acknowledged;
   } catch (e) {
     // console.log("Error deleting order", e);
-    e.message = "Order ID is incorrect";
+    e.message = "Order id is incorrect";
     e.status = 400;
     throw e;
   }
@@ -62,7 +66,7 @@ export const getOrder = async (id, user, role) => {
     return order;
   } catch (e) {
     console.log("Error getting order", e);
-    e.message = "The Order ID query parameter is wrong or undefined";
+    e.message = "The Order id query parameter is wrong or undefined";
     e.status = 400;
     throw e;
   }

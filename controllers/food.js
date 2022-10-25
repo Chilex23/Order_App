@@ -28,7 +28,7 @@ export const addFoodController = async (req, res, next) => {
         .json({ message: validationResult.error.message, success: false });
     }
 
-    const foodResult = await addFood(req.body, next);
+    const foodResult = await addFood(req.body);
     res.status(201).json({
       message: "Food Item added successfully",
       data: foodResult,
@@ -42,6 +42,10 @@ export const addFoodController = async (req, res, next) => {
 export const getAllFoodController = async (req, res, next) => {
   try {
     let pageNo = req.query.page;
+    if (pageNo <= 0 || /\D{1,}/.test(pageNo))
+      return res
+        .status(400)
+        .json({ message: "The page query parameter must be greater than 0 and must be a number" });
     const { foodItems, totalFoodItems, currentPage, totalPages } =
       await getAllFood(pageNo, next);
     if (!foodItems || foodItems.length == 0)
@@ -86,7 +90,9 @@ export const updateFoodController = async (req, res, next) => {
       error.status = 400;
       throw error;
     }
-    return res.status(200).json({ data, success: true });
+    return res
+      .status(200)
+      .json({ message: "Edit successfull.", success: true });
   } catch (e) {
     next(e);
   }

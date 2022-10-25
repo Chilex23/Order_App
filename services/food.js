@@ -2,7 +2,7 @@ import e from "express";
 import Food from "../models/food.js";
 import { AvgRating } from "../utils/AvgRating.js";
 
-export const addFood = async (body, next) => {
+export const addFood = async (body) => {
   try {
     const food = await Food.create({
       title: body.title,
@@ -11,8 +11,8 @@ export const addFood = async (body, next) => {
     });
     return food;
   } catch (e) {
-    console.log("error in add function", e);
-    next(e);
+    e.status = 400;
+    throw e;
   }
 };
 
@@ -37,9 +37,14 @@ export const getAllFood = async (pageNo, next) => {
     const FOOD_ITEMS_PER_PAGE = 10;
     let start = (pageNo - 1) * FOOD_ITEMS_PER_PAGE;
     let end = start + FOOD_ITEMS_PER_PAGE;
-    const selection = await Food.find({});
+    const selection = await Food.find({}).sort({ dateAdded: "desc" });
     let totalFoodItems = selection.length;
     let totalPages = Math.ceil(totalFoodItems / FOOD_ITEMS_PER_PAGE);
+    if (currentPage > totalPages) {
+      let error = new Error("Page no is out of range.")
+      error.status = 400;
+      throw error;
+    }
     let foodItems = selection.slice(start, end);
     return { foodItems, totalFoodItems, currentPage, totalPages };
   } catch (e) {
@@ -110,7 +115,7 @@ export const updateReview = async (id, user, body) => {
     };
     food.reviews[reviewedItemIndex] = review;
     food.avgRating = AvgRating(food.reviews);
-    food.save();
+    await food.save();
     return true;
   } catch (e) {
     e.status = 400;
@@ -145,7 +150,7 @@ export const deleteReview = async (id, user) => {
     }
     food.reviews.splice(reviewedItemIndex, 1);
     food.avgRating = AvgRating(food.reviews);
-    food.save();
+    await food.save();
     return true;
   } catch (e) {
     throw e;

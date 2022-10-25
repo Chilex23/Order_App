@@ -54,7 +54,7 @@ export const getUserOrdersController = async (req, res, next) => {
     if (req.user.username !== user)
       return res
         .status(401)
-        .json({ message: "You can't view", success: false });
+        .json({ message: "You can't view this order", success: false });
     if (!orders || orders.length == 0)
       return res.status(400).json({
         message: "Bad Request, check the username or the query parameter page.",
@@ -72,6 +72,10 @@ export const getUserOrdersController = async (req, res, next) => {
 export const getAllOrderController = async (req, res, next) => {
   try {
     let pageNo = req.query.page;
+    if (pageNo <= 0 || /\D{1,}/.test(pageNo))
+      return res
+        .status(400)
+        .json({ message: "The page query parameter must be greater than 0 and must be a number" });
     let sortFormat = req.query.sort;
     const { orders, totalOrders, currentPage, totalPages } = await getOrders(
       pageNo,
@@ -95,15 +99,20 @@ export const getAllOrderController = async (req, res, next) => {
 export const getOrderController = async (req, res, next) => {
   try {
     let id = req.query.id;
+    if (!id)
+      return res
+        .status(400)
+        .json({
+          message: "Bad Request, No query parameter for id.",
+          success: false,
+        });
     let { username, role } = req.user;
     let order = await getOrder(id, username, role);
     if (!order)
-      return res
-        .status(404)
-        .json({
-          message: "Order not found, you are not permitted to view this order",
-          success: false,
-        });
+      return res.status(404).json({
+        message: "Order not found, you are not permitted to view this order",
+        success: false,
+      });
 
     return res.status(200).json({ data: order, success: true });
   } catch (e) {
