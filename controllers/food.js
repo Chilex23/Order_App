@@ -28,7 +28,7 @@ export const addFoodController = async (req, res, next) => {
         .json({ message: validationResult.error.message, success: false });
     }
   
-    req.body.foodImageLink = req.file.path;
+    if (req?.file?.path) req.body.foodImageLink = req.file.path;
     const foodResult = await addFood(req.body);
     res.status(201).json({
       message: "Food Item added successfully",
