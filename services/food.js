@@ -1,4 +1,3 @@
-import e from "express";
 import Food from "../models/food.js";
 import { AvgRating } from "../utils/AvgRating.js";
 
@@ -8,6 +7,7 @@ export const addFood = async (body) => {
       title: body.title,
       description: body.description,
       price: body.price,
+      imageLink: body.foodImageLink
     });
     return food;
   } catch (e) {
@@ -89,7 +89,7 @@ export const addReview = async (id, user, body) => {
     }
     food.reviews.push(review);
     food.avgRating = AvgRating(food.reviews);
-    food.save();
+    await food.save();
     return true;
   } catch (e) {
     e.status = 400;
