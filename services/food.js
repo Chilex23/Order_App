@@ -55,8 +55,8 @@ export const getAllFood = async (pageNo, next) => {
 export const editFood = async (id, body, next) => {
   try {
     const food = await Food.updateOne({ title: id }, { $set: body });
-    console.log(food)
-    return food.acknowledged;
+    const foodItem = await Food.findOne({ title: id });
+    return { isUpdated: food.acknowledged, data: foodItem };
   } catch (e) {
     console.log("error in edit food function", e);
     next(e);

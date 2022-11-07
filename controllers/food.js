@@ -87,8 +87,8 @@ export const updateFoodController = async (req, res, next) => {
         .status(400)
         .json({ message: validationResult.error.message, success: false });
     }
-    const data = await editFood(id, req.body, next);
-    if (!data) {
+    const { isUpdated, data } = await editFood(id, req.body, next);
+    if (!isUpdated) {
       const error = new Error("Edit failure");
       error.status = 400;
       throw error;
