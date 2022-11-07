@@ -7,7 +7,7 @@ export const addFood = async (body) => {
       title: body.title,
       description: body.description,
       price: body.price,
-      imageLink: body.foodImageLink
+      imageLink: body.foodImageLink,
     });
     return food;
   } catch (e) {
@@ -41,7 +41,7 @@ export const getAllFood = async (pageNo, next) => {
     let totalFoodItems = selection.length;
     let totalPages = Math.ceil(totalFoodItems / FOOD_ITEMS_PER_PAGE);
     if (currentPage > totalPages) {
-      let error = new Error("Page no is out of range.")
+      let error = new Error("Page no is out of range.");
       error.status = 400;
       throw error;
     }
@@ -62,10 +62,9 @@ export const editFood = async (id, body, next) => {
   }
 };
 
-export const deleteFood = async (id, next) => {
+export const deleteFood = async (title, next) => {
   try {
-    const order = await Food.deleteOne({ _id: id });
-    console.log(order.acknowledged);
+    const order = await Food.deleteOne({ title });
     return order.acknowledged;
   } catch (e) {
     // console.log("Del food error", e)
@@ -127,7 +126,7 @@ export const getReviews = async (id) => {
   try {
     const food = await Food.findById(id);
     if (!food) {
-      const error = new Error("No reviews found for this food item.")
+      const error = new Error("No reviews found for this food item.");
       error.status = 400;
       throw error;
     }

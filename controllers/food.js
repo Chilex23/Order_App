@@ -101,8 +101,8 @@ export const updateFoodController = async (req, res, next) => {
 
 export const deleteFoodController = async (req, res, next) => {
   try {
-    let { id } = req.params;
-    if (await deleteFood(id, next))
+    let { title } = req.params;
+    if (await deleteFood(title, next))
       return res
         .status(200)
         .json({ message: "Deleted Food successfully", success: true });

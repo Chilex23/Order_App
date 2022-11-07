@@ -11,7 +11,7 @@ export const router = express.Router();
 router.use(passport.authenticate("jwt", { session: false }));
 router.get("/profile", (req, res, next) => {
   const token = getToken(req);
-  console.log(token);
+  // console.log(token);
 
   res.status(200).json({
     message: "You made it to the secured route",
