@@ -54,7 +54,8 @@ export const getAllFood = async (pageNo, next) => {
 
 export const editFood = async (id, body, next) => {
   try {
-    const food = await Food.updateOne({ _id: id }, { $set: body });
+    const food = await Food.updateOne({ title: id }, { $set: body });
+    console.log(food)
     return food.acknowledged;
   } catch (e) {
     console.log("error in edit food function", e);
@@ -62,9 +63,9 @@ export const editFood = async (id, body, next) => {
   }
 };
 
-export const deleteFood = async (title, next) => {
+export const deleteFood = async (id, next) => {
   try {
-    const order = await Food.deleteOne({ title });
+    const order = await Food.deleteOne({ title: id });
     return order.acknowledged;
   } catch (e) {
     // console.log("Del food error", e)

@@ -27,7 +27,7 @@ export const addFoodController = async (req, res, next) => {
         .status(400)
         .json({ message: validationResult.error.message, success: false });
     }
-  
+
     if (req?.file?.path) req.body.foodImageLink = req.file.path;
     const foodResult = await addFood(req.body);
     res.status(201).json({
@@ -44,9 +44,11 @@ export const getAllFoodController = async (req, res, next) => {
   try {
     let pageNo = req.query.page;
     if (pageNo <= 0 || /\D{1,}/.test(pageNo))
-      return res
-        .status(400)
-        .json({ message: "The page query parameter must be greater than 0 and must be a number" });
+      return res.status(400).json({
+        message:
+          "The page query parameter must be greater than 0 and must be a number",
+        success: false,
+      });
     const { foodItems, totalFoodItems, currentPage, totalPages } =
       await getAllFood(pageNo, next);
     if (!foodItems || foodItems.length == 0)
@@ -93,7 +95,7 @@ export const updateFoodController = async (req, res, next) => {
     }
     return res
       .status(200)
-      .json({ message: "Edit successfull.", success: true });
+      .json({ message: "Edit successfull.", data, success: true });
   } catch (e) {
     next(e);
   }
@@ -101,8 +103,8 @@ export const updateFoodController = async (req, res, next) => {
 
 export const deleteFoodController = async (req, res, next) => {
   try {
-    let { title } = req.params;
-    if (await deleteFood(title, next))
+    let { id } = req.params;
+    if (await deleteFood(id, next))
       return res
         .status(200)
         .json({ message: "Deleted Food successfully", success: true });
