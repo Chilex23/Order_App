@@ -6,8 +6,8 @@ import { after } from "mocha";
 const server = supertest.agent(app);
 
 let token = process.env.JWT_TOKEN;
-let food_id = "636812499a7c8a0f43e6b460";
-//let updateFoodId;
+let food_id = "7ebef72d-a3ed-4474-92eb-aee446a49011";
+let updateFoodId, newFoodId;
 let newFoodItem = {
   title: "Taco",
   description: "Extra wrappings",
@@ -42,7 +42,7 @@ describe("Food Test", function () {
     // Delete it from the db
     after(async function () {
       await server
-        .delete("/api/food/delete/Taco")
+        .delete(`/api/food/delete/${newFoodId}`)
         .set("Authorization", "Bearer " + token);
     });
 
@@ -51,6 +51,8 @@ describe("Food Test", function () {
         .post("/api/food/add")
         .set("Authorization", "Bearer " + token)
         .send(newFoodItem);
+      newFoodId = res.body.data.uuid;
+
       assert.exists(res.body);
       assert.equal(res.status, 201);
       assert.isObject(res.body.data);
@@ -120,21 +122,22 @@ describe("Food Test", function () {
 
   describe("Update Food Item", function () {
     beforeEach(async function () {
-      await server
+      const res = await server
         .post("/api/food/add")
         .set("Authorization", "Bearer " + token)
         .send(newFoodItem);
+      updateFoodId = res.body.data.uuid;
     });
 
     afterEach(async function () {
       await server
-        .delete("/api/food/delete/Taco")
+        .delete(`/api/food/delete/${updateFoodId}`)
         .set("Authorization", "Bearer " + token);
     });
 
     it("update food successfully", async function () {
       const res = await server
-        .patch(`/api/food/update/Taco`)
+        .patch(`/api/food/update/${updateFoodId}`)
         .set("Authorization", "Bearer " + token)
         .send(updateFoodJson);
 

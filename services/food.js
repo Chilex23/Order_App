@@ -1,9 +1,11 @@
+import { v4 as uuidv4 } from 'uuid';
 import Food from "../models/food.js";
 import { AvgRating } from "../utils/AvgRating.js";
 
 export const addFood = async (body) => {
   try {
     const food = await Food.create({
+      uuid: uuidv4(),
       title: body.title,
       description: body.description,
       price: body.price,
@@ -18,7 +20,7 @@ export const addFood = async (body) => {
 
 export const getFood = async (id) => {
   try {
-    const food = await Food.findById(id);
+    const food = await Food.findOne({ uuid: id });
     if (!food) {
       const error = new Error("No food item found");
       error.status = 404;
@@ -54,8 +56,8 @@ export const getAllFood = async (pageNo, next) => {
 
 export const editFood = async (id, body, next) => {
   try {
-    const food = await Food.updateOne({ title: id }, { $set: body });
-    const foodItem = await Food.findOne({ title: id });
+    const food = await Food.updateOne({ uuid: id }, { $set: body });
+    const foodItem = await Food.findOne({ uuid: id });
     return { isUpdated: food.acknowledged, data: foodItem };
   } catch (e) {
     console.log("error in edit food function", e);
@@ -65,7 +67,7 @@ export const editFood = async (id, body, next) => {
 
 export const deleteFood = async (id, next) => {
   try {
-    const order = await Food.deleteOne({ title: id });
+    const order = await Food.deleteOne({ uuid: id });
     return order.acknowledged;
   } catch (e) {
     // console.log("Del food error", e)
