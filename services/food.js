@@ -79,7 +79,7 @@ export const deleteFood = async (id, next) => {
 export const addReview = async (id, user, body) => {
   try {
     const review = { ...body, reviewer: user };
-    const food = await Food.findById(id);
+    const food = await Food.findOne({ uuid: id });
     if (!food) {
       const error = new Error("Can't find food item, check the id.");
       error.status = 400;
@@ -101,7 +101,7 @@ export const addReview = async (id, user, body) => {
 
 export const updateReview = async (id, user, body) => {
   try {
-    const food = await Food.findById(id);
+    const food = await Food.findOne({ uuid: id });
     if (!food) {
       const error = new Error("Can't find food item, check the id.");
       error.status = 400;
@@ -127,7 +127,7 @@ export const updateReview = async (id, user, body) => {
 
 export const getReviews = async (id) => {
   try {
-    const food = await Food.findById(id);
+    const food = await Food.findOne({ uuid: id });
     if (!food) {
       const error = new Error("No reviews found for this food item.");
       error.status = 400;
@@ -141,7 +141,7 @@ export const getReviews = async (id) => {
 
 export const deleteReview = async (id, user) => {
   try {
-    const food = await Food.findById(id);
+    const food = await Food.findOne({ uuid: id });
     const reviewedItemIndex = food.reviews.findIndex(
       (el) => el.reviewer === user
     );

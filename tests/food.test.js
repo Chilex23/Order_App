@@ -7,7 +7,7 @@ const server = supertest.agent(app);
 
 let token = process.env.JWT_TOKEN;
 let food_id = "7ebef72d-a3ed-4474-92eb-aee446a49011";
-let updateFoodId, newFoodId;
+let newFoodId, addFoodId;
 let newFoodItem = {
   title: "Taco",
   description: "Extra wrappings",
@@ -20,18 +20,10 @@ let updateFoodJson = {
   price: 2200,
 };
 
-describe("User page", function () {
-  describe("Get user profile", function () {
-    it("Shows the user profile", async function () {
-      const res = await server
-        .get("/api/users/profile")
-        .set("Authorization", "Bearer " + token);
-      assert.equal(res.status, 200);
-      assert.isObject(res.body);
-      assert.equal(res.body.user.username, "Chilex24");
-    });
-  });
-});
+let reviewJson = {
+  rating: 5,
+  comment: "A very nice food",
+};
 
 describe("Food Test", function () {
   /*
@@ -42,7 +34,7 @@ describe("Food Test", function () {
     // Delete it from the db
     after(async function () {
       await server
-        .delete(`/api/food/delete/${newFoodId}`)
+        .delete(`/api/food/delete/${addFoodId}`)
         .set("Authorization", "Bearer " + token);
     });
 
@@ -51,7 +43,7 @@ describe("Food Test", function () {
         .post("/api/food/add")
         .set("Authorization", "Bearer " + token)
         .send(newFoodItem);
-      newFoodId = res.body.data.uuid;
+      addFoodId = res.body.data.uuid;
 
       assert.exists(res.body);
       assert.equal(res.status, 201);
@@ -126,18 +118,18 @@ describe("Food Test", function () {
         .post("/api/food/add")
         .set("Authorization", "Bearer " + token)
         .send(newFoodItem);
-      updateFoodId = res.body.data.uuid;
+      newFoodId = res.body.data.uuid;
     });
 
     afterEach(async function () {
       await server
-        .delete(`/api/food/delete/${updateFoodId}`)
+        .delete(`/api/food/delete/${newFoodId}`)
         .set("Authorization", "Bearer " + token);
     });
 
     it("update food successfully", async function () {
       const res = await server
-        .patch(`/api/food/update/${updateFoodId}`)
+        .patch(`/api/food/update/${newFoodId}`)
         .set("Authorization", "Bearer " + token)
         .send(updateFoodJson);
 
@@ -148,5 +140,88 @@ describe("Food Test", function () {
         "Extra wrappings and Chilli Pepper."
       );
     });
+  });
+
+  /*
+   * REVIEWS FOR FOOD ENDPOINTS TESTS
+   */
+
+  describe("Review Food Item", function () {
+    beforeEach(async function () {
+      const res = await server
+        .post("/api/food/add")
+        .set("Authorization", "Bearer " + token)
+        .send(newFoodItem);
+      newFoodId = res.body.data.uuid;
+    });
+
+    afterEach(async function () {
+      await server
+        .delete(`/api/food/delete/${newFoodId}`)
+        .set("Authorization", "Bearer " + token);
+    });
+
+    it("should add review to a food successfully", async function () {
+      const res = await server
+        .post(`/api/food/reviews/add/${newFoodId}`)
+        .set("Authorization", "Bearer " + token)
+        .send(reviewJson);
+
+      assert.equal(res.status, 201);
+      assert.isTrue(res.body.success);
+      assert.equal(res.body.message, "Review Submitted");
+    });
+
+    it("should update a review successfully", async function () {
+      await server
+        .post(`/api/food/reviews/add/${newFoodId}`)
+        .set("Authorization", "Bearer " + token)
+        .send(reviewJson);
+
+      const res = await server
+        .patch(`/api/food/reviews/update/${newFoodId}`)
+        .set("Authorization", "Bearer " + token)
+        .send({
+          rating: 4,
+          comment: "Updated review",
+        });
+
+      assert.equal(res.status, 200);
+      assert.isTrue(res.body.success);
+      assert.equal(res.body.message, "Review updated");
+    });
+
+    it("Should list all reviews for a food item", async function () {
+      await server
+        .post(`/api/food/reviews/add/${newFoodId}`)
+        .set("Authorization", "Bearer " + token)
+        .send(reviewJson);
+
+      const res = await server
+        .get(`/api/food/reviews/${newFoodId}`)
+        .set("Authorization", "Bearer " + token);
+
+      assert.equal(res.status, 200);
+      assert.isTrue(res.body.success);
+      assert.isArray(res.body.data);
+      assert.equal(res.body.data[0].rating, 5);
+      assert.equal(res.body.data[0].comment, "A very nice food");
+    });
+
+    it("should delete a review for a food item", async function () {
+      await server
+        .post(`/api/food/reviews/add/${newFoodId}`)
+        .set("Authorization", "Bearer " + token)
+        .send(reviewJson);
+      
+        const res = await server
+        .delete(`/api/food/reviews/delete/${newFoodId}`)
+        .set("Authorization", "Bearer " + token);
+
+        assert.equal(res.status, 200);
+        assert.isTrue(res.body.success);
+        assert.equal(res.body.message, "Review deleted");
+    })
+
   });
 });

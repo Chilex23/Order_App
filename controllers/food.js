@@ -171,7 +171,7 @@ export const deleteReviewController = async (req, res, next) => {
     const { id } = req.params;
     const user = req.user.username || req.body.username;
     if (await deleteReview(id, user))
-      res.status(200).json({ message: "Review delete", success: true });
+      res.status(200).json({ message: "Review deleted", success: true });
   } catch (e) {
     next(e);
   }
