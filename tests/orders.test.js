@@ -23,7 +23,7 @@ const initialOrder = async function () {
     .post("/api/orders/create")
     .set("Authorization", "Bearer " + token)
     .send(newOrder);
-  return data.body.data.uuid;
+  return data;
 };
 
 describe("Orders Tests", function () {
@@ -38,10 +38,7 @@ describe("Orders Tests", function () {
    */
 
   it("should add a new order successfully", async function () {
-    const res = await server
-      .post("/api/orders/create")
-      .set("Authorization", "Bearer " + token)
-      .send(newOrder);
+    const res = await initialOrder();
     newOrderId = res.body.data.uuid;
 
     assert.equal(res.status, 201);
@@ -56,11 +53,8 @@ describe("Orders Tests", function () {
    */
 
   it("should get an order for an id for admin privileges", async function () {
-    const initialOrder = await server
-      .post("/api/orders/create")
-      .set("Authorization", "Bearer " + token)
-      .send(newOrder);
-    newOrderId = initialOrder.body.data.uuid;
+    const init = await initialOrder();
+    newOrderId = init.body.data.uuid;
 
     const res = await server
       .get(`/api/orders?id=${newOrderId}`)
@@ -78,11 +72,8 @@ describe("Orders Tests", function () {
    */
 
   it("should list all orders for admin privileges", async function () {
-    const initialOrder = await server
-      .post("/api/orders/create")
-      .set("Authorization", "Bearer " + token)
-      .send(newOrder);
-    newOrderId = initialOrder.body.data.uuid;
+    const init = await initialOrder();
+    newOrderId = init.body.data.uuid;
 
     const res = await server
       .get(`/api/orders/all?page=1`)
@@ -101,11 +92,8 @@ describe("Orders Tests", function () {
    */
 
   it("should get all orders placed by a user", async function () {
-    const initialOrder = await server
-      .post("/api/orders/create")
-      .set("Authorization", "Bearer " + token)
-      .send(newOrder);
-    newOrderId = initialOrder.body.data.uuid;
+    const init = await initialOrder();
+    newOrderId = init.body.data.uuid;
 
     const res = await server
       .get(`/api/orders/Chilex24?page=1`)
@@ -123,11 +111,8 @@ describe("Orders Tests", function () {
    * CHANGE THE DELIVERY STATE OF AN ORDER ENDPOINT TEST
    */
   it("should change an order state to delivered for admin privileges", async function () {
-    const initialOrder = await server
-      .post("/api/orders/create")
-      .set("Authorization", "Bearer " + token)
-      .send(newOrder);
-    newOrderId = initialOrder.body.data.uuid;
+    const init = await initialOrder();
+    newOrderId = init.body.data.uuid;
 
     const res = await server
       .patch(`/api/orders/deliver/${newOrderId}`)
