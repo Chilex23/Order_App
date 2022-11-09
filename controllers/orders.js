@@ -26,9 +26,9 @@ export const createOrderController = async (req, res, next) => {
   try {
     const { username } = req.user;
     const newOrder = await createOrder(req.body, username, next);
-    return res.status(200).json({
+    return res.status(201).json({
       message: "Order created successfully",
-      ordered_by: newOrder.created_by,
+      ordered_by: newOrder.ordered_by,
       data: newOrder,
       success: true,
       token: token,
@@ -43,7 +43,6 @@ export const getUserOrdersController = async (req, res, next) => {
     let pageNo = req.query.page;
     let user = req.params.id;
     let sortFormat = req.query.sort;
-    console.log(req.user);
     const { orders, totalOrders, currentPage, totalPages } = await getOrders(
       pageNo,
       user,
@@ -69,13 +68,17 @@ export const getUserOrdersController = async (req, res, next) => {
   }
 };
 
+// GET ALL ORDERS FO USER WITH ADMIN PRIVILEGES
 export const getAllOrderController = async (req, res, next) => {
   try {
     let pageNo = req.query.page;
     if (pageNo <= 0 || /\D{1,}/.test(pageNo))
       return res
         .status(400)
-        .json({ message: "The page query parameter must be greater than 0 and must be a number" });
+        .json({
+          message:
+            "The page query parameter must be greater than 0 and must be a number",
+        });
     let sortFormat = req.query.sort;
     const { orders, totalOrders, currentPage, totalPages } = await getOrders(
       pageNo,
@@ -96,16 +99,15 @@ export const getAllOrderController = async (req, res, next) => {
   }
 };
 
+// GET A PARTICULAR ORDER
 export const getOrderController = async (req, res, next) => {
   try {
     let id = req.query.id;
     if (!id)
-      return res
-        .status(400)
-        .json({
-          message: "Bad Request, No query parameter for id.",
-          success: false,
-        });
+      return res.status(400).json({
+        message: "Bad Request, No query parameter for id.",
+        success: false,
+      });
     let { username, role } = req.user;
     let order = await getOrder(id, username, role);
     if (!order)
@@ -123,7 +125,7 @@ export const getOrderController = async (req, res, next) => {
 
 export const deleteOrderController = async (req, res, next) => {
   try {
-    let id = req.query.id;
+    let { id } = req.params;
     if (!id)
       return res.status(400).json({
         message: "Provide the order ID as a query paramter",

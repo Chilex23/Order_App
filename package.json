@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "dev": "nodemon ./bin/www",
-    "test": "mocha --no-timeouts ./tests/food.test.js"
+    "test": "mocha --no-timeouts ./tests/*.test.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",

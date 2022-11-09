@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import Order from "../models/orders.js";
 
 export const createOrder = async (body, user, next) => {
@@ -9,6 +10,7 @@ export const createOrder = async (body, user, next) => {
     );
     const newOrder = await Order.create({
       ...body,
+      uuid: uuidv4(),
       ordered_by: user,
       total_price,
     });
@@ -46,9 +48,8 @@ export const getOrders = async (pageNo, user, sortFormat, next) => {
 
 export const deleteOrder = async (user, id) => {
   try {
-    const filter = user ? { created_by: user, _id: id } : { _id: id };
+    const filter = user ? { created_by: user, uuid: id } : { uuid: id };
     const order = await Order.deleteOne(filter);
-    console.log("delete order", order);
     return order.acknowledged;
   } catch (e) {
     // console.log("Error deleting order", e);
@@ -60,7 +61,7 @@ export const deleteOrder = async (user, id) => {
 
 export const getOrder = async (id, user, role) => {
   try {
-    const filter = user && role === "User" ? { ordered_by: user, _id: id } : { _id: id };
+    const filter = user && role === "User" ? { ordered_by: user, uuid: id } : { uuid: id };
     const order = await Order.findOne(filter);
     // console.log("Get order", order);
     return order;
@@ -74,7 +75,7 @@ export const getOrder = async (id, user, role) => {
 
 export const updateOrder = async (id, user, role, state) => {
   try {
-    const filter = user && role === "User" ? { ordered_by: user, _id: id } : { _id: id };
+    const filter = user && role === "User" ? { ordered_by: user, uuid: id } : { uuid: id };
     const order = await Order.findOneAndUpdate(filter, { $set: { state } });
     return order;
   } catch (e) {
