@@ -10,6 +10,7 @@ export const addFood = async (body) => {
       description: body.description,
       price: body.price,
       imageLink: body.foodImageLink,
+      category: body.category
     });
     return food;
   } catch (e) {
@@ -33,19 +34,27 @@ export const getFood = async (id) => {
   }
 };
 
-export const getAllFood = async (pageNo, next) => {
+export const getAllFood = async (pageNo, filter, next) => {
   try {
+    let findFilter = filter ? { category: filter} : {};
     let currentPage = Number(pageNo) || 1;
     const FOOD_ITEMS_PER_PAGE = 10;
     let start = (pageNo - 1) * FOOD_ITEMS_PER_PAGE;
     let end = start + FOOD_ITEMS_PER_PAGE;
-    const selection = await Food.find({}).sort({ dateAdded: "desc" });
+    const selection = await Food.find(findFilter).sort({ dateAdded: "desc" });
+
+    if (selection.length == 0) {
+      const error = new Error("Could not find food items for this category.");
+      error.status = 404;
+      return next(error);
+    }
+
     let totalFoodItems = selection.length;
     let totalPages = Math.ceil(totalFoodItems / FOOD_ITEMS_PER_PAGE);
     if (currentPage > totalPages) {
       let error = new Error("Page no is out of range.");
       error.status = 400;
-      throw error;
+      return next(error);
     }
     let foodItems = selection.slice(start, end);
     return { foodItems, totalFoodItems, currentPage, totalPages };
@@ -70,7 +79,6 @@ export const deleteFood = async (id, next) => {
     const order = await Food.deleteOne({ uuid: id });
     return order.acknowledged;
   } catch (e) {
-    // console.log("Del food error", e)
     e.status = 400;
     next(e);
   }

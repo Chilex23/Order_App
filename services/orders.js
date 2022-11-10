@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import Order from "../models/orders.js";
 
 export const createOrder = async (body, user, next) => {
@@ -31,12 +31,18 @@ export const getOrders = async (pageNo, user, sortFormat, next) => {
     let start = (pageNo - 1) * ORDERS_PER_PAGE;
     let end = start + ORDERS_PER_PAGE;
     const selection = await Order.find(filter).sort(sort);
+    if (selection.length == 0) {
+      const error = new Error("Could not find orders for this user.");
+      error.status = 404;
+      return next(error);
+    }
+
     let totalOrders = selection.length;
     let totalPages = Math.ceil(totalOrders / ORDERS_PER_PAGE);
     if (currentPage > totalPages) {
-      let error = new Error("Page no is out of range.")
+      let error = new Error("The query parameter 'page' is out of range.");
       error.status = 400;
-      throw error;
+      return next(error);
     }
     let orders = selection.slice(start, end);
     return { orders, totalOrders, currentPage, totalPages };
@@ -61,7 +67,8 @@ export const deleteOrder = async (user, id) => {
 
 export const getOrder = async (id, user, role) => {
   try {
-    const filter = user && role === "User" ? { ordered_by: user, uuid: id } : { uuid: id };
+    const filter =
+      user && role === "User" ? { ordered_by: user, uuid: id } : { uuid: id };
     const order = await Order.findOne(filter);
     // console.log("Get order", order);
     return order;
@@ -75,7 +82,8 @@ export const getOrder = async (id, user, role) => {
 
 export const updateOrder = async (id, user, role, state) => {
   try {
-    const filter = user && role === "User" ? { ordered_by: user, uuid: id } : { uuid: id };
+    const filter =
+      user && role === "User" ? { ordered_by: user, uuid: id } : { uuid: id };
     const order = await Order.findOneAndUpdate(filter, { $set: { state } });
     return order;
   } catch (e) {

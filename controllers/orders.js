@@ -41,7 +41,7 @@ export const createOrderController = async (req, res, next) => {
 export const getUserOrdersController = async (req, res, next) => {
   try {
     let pageNo = req.query.page;
-    let user = req.params.id;
+    let { user } = req.params;
     let sortFormat = req.query.sort;
     const { orders, totalOrders, currentPage, totalPages } = await getOrders(
       pageNo,
@@ -56,7 +56,7 @@ export const getUserOrdersController = async (req, res, next) => {
         .json({ message: "You can't view this order", success: false });
     if (!orders || orders.length == 0)
       return res.status(400).json({
-        message: "Bad Request, check the username or the query parameter page.",
+        message: "Bad Request, check the username or the query parameter 'page'.",
         success: false,
       });
     return res
@@ -73,12 +73,10 @@ export const getAllOrderController = async (req, res, next) => {
   try {
     let pageNo = req.query.page;
     if (pageNo <= 0 || /\D{1,}/.test(pageNo))
-      return res
-        .status(400)
-        .json({
-          message:
-            "The page query parameter must be greater than 0 and must be a number",
-        });
+      return res.status(400).json({
+        message:
+          "The page query parameter must be greater than 0 and must be a number",
+      });
     let sortFormat = req.query.sort;
     const { orders, totalOrders, currentPage, totalPages } = await getOrders(
       pageNo,

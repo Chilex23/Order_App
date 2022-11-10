@@ -4,7 +4,8 @@ export const foodValidator = (body) => {
   const schema = Joi.object().keys({
     title: Joi.string().max(40).required(),
     description: Joi.string().required(),
-    price: Joi.number(),
+    price: Joi.number().required(),
+    category: Joi.string().required()
   });
   return schema.validate(body);
 };

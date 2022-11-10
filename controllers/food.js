@@ -3,6 +3,7 @@ import {
   updateFoodValidator,
   addReviewValidator,
 } from "../validators/food.js";
+import * as fs from "fs/promises";
 import {
   addFood,
   getAllFood,
@@ -22,13 +23,15 @@ const error = DBG("orderApp:food-controller-error");
 export const addFoodController = async (req, res, next) => {
   try {
     const validationResult = foodValidator(req.body);
+    if (req?.file?.path) req.body.foodImageLink = req.file.path;
+
     if (validationResult.error) {
+      await fs.rm(req.body.foodImageLink);
       return res
         .status(400)
         .json({ message: validationResult.error.message, success: false });
     }
 
-    if (req?.file?.path) req.body.foodImageLink = req.file.path;
     const foodResult = await addFood(req.body);
     res.status(201).json({
       message: "Food Item added successfully",
@@ -36,6 +39,7 @@ export const addFoodController = async (req, res, next) => {
       success: true,
     });
   } catch (e) {
+    await fs.rm(req.body.foodImageLink);
     next(e);
   }
 };
@@ -50,7 +54,7 @@ export const getAllFoodController = async (req, res, next) => {
         success: false,
       });
     const { foodItems, totalFoodItems, currentPage, totalPages } =
-      await getAllFood(pageNo, next);
+      await getAllFood(pageNo, null, next);
     if (!foodItems || foodItems.length == 0)
       return res.status(400).json({
         message: "Bad Request, No query parameter for page.",
@@ -67,6 +71,30 @@ export const getAllFoodController = async (req, res, next) => {
     next(e);
   }
 };
+
+export const getFoodsByCategoryController = async (req, res, next) => {
+  try {
+    let pageNo = req.query.page;
+    const { category } = req.params;
+    // const foods = await getFoodsByCategory(category, pageNo, next);
+    const { foodItems, totalFoodItems, currentPage, totalPages } =
+      await getAllFood(pageNo, category, next);
+    if (!foodItems || foodItems.length == 0)
+      return res.status(400).json({
+        message: "Bad Request, No query parameter for page.",
+        success: false,
+      });
+    return res.status(200).json({
+      foodItems,
+      totalFoodItems,
+      currentPage,
+      totalPages,
+      success: true,
+    })
+  } catch (e) {
+    next(e);
+  }
+}
 
 export const getFoodController = async (req, res, next) => {
   try {

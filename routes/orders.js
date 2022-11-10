@@ -15,6 +15,6 @@ router.use(passport.authenticate("jwt", { session: false }));
 router.get("/", getOrderController);
 router.get("/all", restrictTo("Admin"), getAllOrderController);
 router.post("/create", createOrderController);
-router.get("/:id", getUserOrdersController);
+router.get("/:user", getUserOrdersController);
 router.delete("/delete/:id", deleteOrderController);
 router.patch("/deliver/:id", deliveredOrderController);
