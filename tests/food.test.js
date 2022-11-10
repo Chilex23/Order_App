@@ -6,12 +6,13 @@ import { after } from "mocha";
 const server = supertest.agent(app);
 
 let token = process.env.JWT_TOKEN;
-let food_id = "7ebef72d-a3ed-4474-92eb-aee446a49011";
+let food_id = "eafb62b1-3d89-4286-a0cd-f5b384e9156d";
 let newFoodId, addFoodId;
 let newFoodItem = {
   title: "Taco",
   description: "Extra wrappings",
   price: 2000,
+  category: "Snacks"
 };
 
 let updateFoodJson = {

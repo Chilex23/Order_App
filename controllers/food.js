@@ -2,7 +2,7 @@ import {
   foodValidator,
   updateFoodValidator,
   addReviewValidator,
-  addCategoryValidator
+  addCategoryValidator,
 } from "../validators/food.js";
 import * as fs from "fs/promises";
 import {
@@ -28,7 +28,7 @@ export const addFoodController = async (req, res, next) => {
     if (req?.file?.path) req.body.foodImageLink = req.file.path;
 
     if (validationResult.error) {
-      await fs.rm(req.body.foodImageLink);
+      if (req.body.foodImageLink) await fs.rm(req.body.foodImageLink);
       return res
         .status(400)
         .json({ message: validationResult.error.message, success: false });
@@ -41,7 +41,7 @@ export const addFoodController = async (req, res, next) => {
       success: true,
     });
   } catch (e) {
-    await fs.rm(req.body.foodImageLink);
+    if (req.body.foodImageLink) await fs.rm(req.body.foodImageLink);
     next(e);
   }
 };
@@ -49,7 +49,7 @@ export const addFoodController = async (req, res, next) => {
 export const addCategoryController = async (req, res, next) => {
   try {
     const validationResult = addCategoryValidator(req.body);
-    
+
     if (validationResult.error) {
       return res
         .status(400)
@@ -62,10 +62,10 @@ export const addCategoryController = async (req, res, next) => {
       data: catgoryResult,
       success: true,
     });
-  } catch(e) {
-    next(e)
+  } catch (e) {
+    next(e);
   }
-}
+};
 
 export const getAllFoodController = async (req, res, next) => {
   try {
@@ -113,11 +113,11 @@ export const getFoodsByCategoryController = async (req, res, next) => {
       currentPage,
       totalPages,
       success: true,
-    })
+    });
   } catch (e) {
     next(e);
   }
-}
+};
 
 export const getFoodController = async (req, res, next) => {
   try {
