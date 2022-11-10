@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import Food from "../models/food.js";
+import Category from '../models/category.js';
 import { AvgRating } from "../utils/AvgRating.js";
 
 export const addFood = async (body) => {
@@ -83,6 +84,16 @@ export const deleteFood = async (id, next) => {
     next(e);
   }
 };
+
+export const addCategory = async (body) => {
+  try {
+    const newCategory = await Category.create(body);
+    return newCategory;
+  } catch (e) {
+    e.status = 400;
+    throw e;
+  }
+}
 
 export const addReview = async (id, user, body) => {
   try {

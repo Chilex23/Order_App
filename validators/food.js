@@ -5,7 +5,7 @@ export const foodValidator = (body) => {
     title: Joi.string().max(40).required(),
     description: Joi.string().required(),
     price: Joi.number().required(),
-    category: Joi.string().required()
+    category: Joi.string().required(),
   });
   return schema.validate(body);
 };
@@ -24,6 +24,13 @@ export const addReviewValidator = (body) => {
     // reviewer: Joi.string().required(),
     rating: Joi.number().required(),
     comment: Joi.string().required(),
+  });
+  return schema.validate(body);
+};
+
+export const addCategoryValidator = (body) => {
+  const schema = Joi.object().keys({
+    type: Joi.string().required(),
   });
   return schema.validate(body);
 };

@@ -4,6 +4,7 @@ import { restrictTo } from "../middleware/auth.js";
 import { upload } from "../middleware/upload.js";
 import {
   addFoodController,
+  addCategoryController,
   updateFoodController,
   getAllFoodController,
   getFoodController,
@@ -21,6 +22,7 @@ router.use(passport.authenticate("jwt", { session: false }));
 router.get("/", getAllFoodController);
 router.get("/:id", getFoodController);
 router.get("/category/:category", getFoodsByCategoryController);
+router.post("/category/add", restrictTo("Admin"), addCategoryController);
 router.post("/add", restrictTo("Admin"), upload.single("foodImage"), addFoodController);
 router.patch("/update/:id", restrictTo("Admin"), updateFoodController);
 router.delete("/delete/:id", restrictTo("Admin"), deleteFoodController);

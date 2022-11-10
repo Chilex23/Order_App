@@ -2,6 +2,7 @@ import {
   foodValidator,
   updateFoodValidator,
   addReviewValidator,
+  addCategoryValidator
 } from "../validators/food.js";
 import * as fs from "fs/promises";
 import {
@@ -10,6 +11,7 @@ import {
   getFood,
   editFood,
   deleteFood,
+  addCategory,
   addReview,
   updateReview,
   getReviews,
@@ -43,6 +45,27 @@ export const addFoodController = async (req, res, next) => {
     next(e);
   }
 };
+
+export const addCategoryController = async (req, res, next) => {
+  try {
+    const validationResult = addCategoryValidator(req.body);
+    
+    if (validationResult.error) {
+      return res
+        .status(400)
+        .json({ message: validationResult.error.message, success: false });
+    }
+
+    const catgoryResult = await addCategory(req.body);
+    res.status(201).json({
+      message: "Category added successfully",
+      data: catgoryResult,
+      success: true,
+    });
+  } catch(e) {
+    next(e)
+  }
+}
 
 export const getAllFoodController = async (req, res, next) => {
   try {
