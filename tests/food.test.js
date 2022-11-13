@@ -204,9 +204,9 @@ describe("Food Test", function () {
 
       assert.equal(res.status, 200);
       assert.isTrue(res.body.success);
-      assert.isArray(res.body.data);
-      assert.equal(res.body.data[0].rating, 5);
-      assert.equal(res.body.data[0].comment, "A very nice food");
+      assert.isObject(res.body.data);
+      assert.equal(res.body.data["Chilex24"].rating, 5);
+      assert.equal(res.body.data["Chilex24"].comment, "A very nice food");
     });
 
     it("should delete a review for a food item", async function () {
