@@ -1,6 +1,6 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import Food from "../models/food.js";
-import Category from '../models/category.js';
+import Category from "../models/category.js";
 import { AvgRating } from "../utils/AvgRating.js";
 
 export const addFood = async (body) => {
@@ -11,7 +11,7 @@ export const addFood = async (body) => {
       description: body.description,
       price: body.price,
       imageLink: body.foodImageLink,
-      category: body.category
+      category: body.category,
     });
     return food;
   } catch (e) {
@@ -37,7 +37,7 @@ export const getFood = async (id) => {
 
 export const getAllFood = async (pageNo, filter, next) => {
   try {
-    let findFilter = filter ? { category: filter} : {};
+    let findFilter = filter ? { category: filter } : {};
     let currentPage = Number(pageNo) || 1;
     const FOOD_ITEMS_PER_PAGE = 10;
     let start = (pageNo - 1) * FOOD_ITEMS_PER_PAGE;
@@ -93,22 +93,27 @@ export const addCategory = async (body) => {
     e.status = 400;
     throw e;
   }
-}
+};
 
 export const addReview = async (id, user, body) => {
   try {
-    const review = { ...body, reviewer: user };
     const food = await Food.findOne({ uuid: id });
     if (!food) {
       const error = new Error("Can't find food item, check the id.");
       error.status = 400;
       throw error;
     }
-    const alreadyReviewed = food.reviews.find((el) => el.reviewer === user);
+    let alreadyReviewed;
+    if (food.reviews) alreadyReviewed = food?.reviews[user];
     if (alreadyReviewed) {
       return false;
     }
-    food.reviews.push(review);
+    food.reviews = {
+      ...food.reviews,
+      [user]: {
+        ...body,
+      },
+    };
     food.avgRating = AvgRating(food.reviews);
     await food.save();
     return true;
@@ -126,15 +131,13 @@ export const updateReview = async (id, user, body) => {
       error.status = 400;
       throw error;
     }
-    const reviewedItemIndex = food.reviews.findIndex(
-      (el) => el.reviewer === user
-    );
-    const review = {
-      ...body,
-      reviewer: user,
-      _id: food.reviews[reviewedItemIndex]._id,
+   
+    food.reviews = {
+      ...food.reviews,
+      [user]: {
+        ...body,
+      },
     };
-    food.reviews[reviewedItemIndex] = review;
     food.avgRating = AvgRating(food.reviews);
     await food.save();
     return true;
@@ -161,15 +164,18 @@ export const getReviews = async (id) => {
 export const deleteReview = async (id, user) => {
   try {
     const food = await Food.findOne({ uuid: id });
-    const reviewedItemIndex = food.reviews.findIndex(
-      (el) => el.reviewer === user
-    );
-    if (reviewedItemIndex === -1) {
+    if (!food.reviews[user]) {
       const error = new Error("Can't find review for this food item.");
       error.status = 404;
       throw error;
     }
-    food.reviews.splice(reviewedItemIndex, 1);
+    const newObj = {
+      ...food.reviews
+    }
+    delete newObj[user];
+    food.reviews = {
+      ...newObj
+    }
     food.avgRating = AvgRating(food.reviews);
     await food.save();
     return true;

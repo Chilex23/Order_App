@@ -11,13 +11,7 @@ const FoodSchema = new Schema({
   imageLink: { type: String },
   dateAdded: { type: Date, default: Date.now() },
   price: { type: Number, required: true },
-  reviews: [
-    {
-      reviewer: String,
-      rating: { type: Number, min: 0, max: 5 },
-      comment: String,
-    },
-  ],
+  reviews: { type: Schema.Types.Mixed },
 });
 
 const Food = model("Food", FoodSchema);
