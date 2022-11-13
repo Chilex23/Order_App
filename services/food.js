@@ -103,8 +103,7 @@ export const addReview = async (id, user, body) => {
       error.status = 400;
       throw error;
     }
-    let alreadyReviewed;
-    if (food.reviews) alreadyReviewed = food?.reviews[user];
+    let alreadyReviewed = food.reviews ? food?.reviews[user] : null;
     if (alreadyReviewed) {
       return false;
     }
