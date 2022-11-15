@@ -5,6 +5,7 @@ dotenv.config();
 import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import util from "util";
 import "./config/db.js";
 import "./middleware/auth.js";
@@ -28,12 +29,14 @@ let app = express();
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "hbs");
 
+app.use(cors());
+app.disable("x-powered-by");
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-app.use('/uploads', express.static('uploads'));
+app.use("/uploads", express.static("uploads"));
 
 app.use("/api", indexRouter);
 app.use("/api/food", foodRouter);
