@@ -30,7 +30,6 @@ export const loginController = async (req, res, next) => {
 export const signUpController = async (req, res, next) => {
   passport.authenticate("signup", async (err, user, info) => {
     try {
-      // console.log("signup route err", err, "signup route info", info);
       if (info) {
         const { message } = info;
         return res.status(401).json({ message, success: false });
@@ -41,7 +40,7 @@ export const signUpController = async (req, res, next) => {
         const { message } = err;
         return res.status(400).json({ message, success: false });
       }
-      // console.log(user);
+     
       return res
         .status(201)
         .json({

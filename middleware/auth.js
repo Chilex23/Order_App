@@ -18,7 +18,6 @@ passport.use(
       passReqToCallback: true,
     },
     async (req, username, password, done) => {
-      // console.log("request body", req.body);
       try {
         const validateResult = signUpValidator(req.body);
         if (validateResult.error) {
@@ -28,7 +27,6 @@ passport.use(
         if (!(await checkUsername(req.body.username)))
           return done(null, false, { message: "Username already exists" });
         const user = await User.create(req.body);
-        console.log("user created", user);
         return done(null, user);
       } catch (e) {
         console.log("Throw async bad request");
@@ -46,16 +44,13 @@ passport.use(
       passwordField: "password",
     },
     async (username, password, done) => {
-      // console.log(username);
       const body = { username, password };
       try {
         const validateResult = loginValidator(body);
         if (validateResult.error) {
-          console.log("Bad request logging in.", validateResult.error.message);
           return done(null, false, { message: validateResult.error.message });
         }
         const user = await User.findOne({ username });
-        // console.log(user)
         if (!user) {
           return done(null, false, {
             message: "User not found, check the username provided.",
@@ -98,7 +93,7 @@ export const restrictTo = (...roles) => {
     if (!roles.includes(req.user.role)) {
       return res.status(401).json({
         message: "You do not have the permission to carry out this request.",
-        success: false
+        success: false,
       });
     }
     next();
