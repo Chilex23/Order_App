@@ -2,7 +2,8 @@ import { v4 as uuidv4 } from "uuid";
 import Food from "../models/food.js";
 import Category from "../models/category.js";
 import { AvgRating } from "../utils/AvgRating.js";
-import * as fs from "fs/promises";
+import * as fsPromisify from "fs/promises";
+import { constants, existsSync } from "fs";
 import path from "path";
 import { __dirname } from "../app.js";
 
@@ -81,8 +82,15 @@ export const editFood = async (id, body, next) => {
 export const deleteFood = async (id, next) => {
   try {
     const foodItem = await Food.findOne({ uuid: id });
-    const filename = path.join(__dirname, foodItem.imageLink);
-    await fs.unlink(filename);
+    if (foodItem.imageLink) {
+      const filename = path.join(__dirname, foodItem.imageLink);
+      if (existsSync(filename)) {
+        console.log("file exists");
+        await fsPromisify.unlink(filename);
+      } else {
+        console.log("file not found!");
+      }
+    }
     const order = await Food.deleteOne({ uuid: id });
     return order.acknowledged;
   } catch (e) {
@@ -136,7 +144,7 @@ export const updateReview = async (id, user, body) => {
       error.status = 400;
       throw error;
     }
-   
+
     food.reviews = {
       ...food.reviews,
       [user]: {
@@ -175,12 +183,12 @@ export const deleteReview = async (id, user) => {
       throw error;
     }
     const newObj = {
-      ...food.reviews
-    }
+      ...food.reviews,
+    };
     delete newObj[user];
     food.reviews = {
-      ...newObj
-    }
+      ...newObj,
+    };
     food.avgRating = AvgRating(food.reviews);
     await food.save();
     return true;
