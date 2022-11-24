@@ -21,7 +21,7 @@ const debug = DBG("orderApp:debug");
 const error = DBG("orderApp:error");
 
 // Workaround for lack of __dirname in ES6 modules
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+export const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 let app = express();
 

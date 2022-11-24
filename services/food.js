@@ -2,6 +2,9 @@ import { v4 as uuidv4 } from "uuid";
 import Food from "../models/food.js";
 import Category from "../models/category.js";
 import { AvgRating } from "../utils/AvgRating.js";
+import * as fs from "fs/promises";
+import path from "path";
+import { __dirname } from "../app.js";
 
 export const addFood = async (body) => {
   try {
@@ -77,6 +80,9 @@ export const editFood = async (id, body, next) => {
 
 export const deleteFood = async (id, next) => {
   try {
+    const foodItem = await Food.findOne({ uuid: id });
+    const filename = path.join(__dirname, foodItem.imageLink);
+    await fs.unlink(filename);
     const order = await Food.deleteOne({ uuid: id });
     return order.acknowledged;
   } catch (e) {
