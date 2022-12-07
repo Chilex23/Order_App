@@ -49,7 +49,7 @@ export const getAllFood = async (pageNo, filter, next) => {
     const selection = await Food.find(findFilter).sort({ dateAdded: "desc" });
 
     if (selection.length == 0) {
-      const error = new Error("Could not find food items for this category.");
+      const error = new Error("Could not find food items.");
       error.status = 404;
       return next(error);
     }
