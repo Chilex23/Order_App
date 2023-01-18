@@ -24,6 +24,7 @@ export const createOrder = async (body, user, next) => {
 export const getOrders = async (pageNo, user, sortFormat, next) => {
   try {
     const filter = user ? { ordered_by: user } : {};
+    // Sort the food items defaultly by date, unless specified by price.
     const sort =
       sortFormat == "price" ? { total_price: "desc" } : { order_date: "desc" };
     let currentPage = Number(pageNo) || 1;
