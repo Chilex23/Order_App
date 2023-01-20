@@ -55,6 +55,7 @@ export const getOrders = async (pageNo, user, sortFormat, next) => {
 
 export const deleteOrder = async (user, id) => {
   try {
+    // Only an admin can delete any order, a user can delete only his orders
     const filter = user ? { created_by: user, uuid: id } : { uuid: id };
     const order = await Order.deleteOne(filter);
     return order.acknowledged;
@@ -68,6 +69,7 @@ export const deleteOrder = async (user, id) => {
 
 export const getOrder = async (id, user, role) => {
   try {
+    // Only an admin can get any order, a user can get only his orders
     const filter =
       user && role === "User" ? { ordered_by: user, uuid: id } : { uuid: id };
     const order = await Order.findOne(filter);
@@ -83,6 +85,7 @@ export const getOrder = async (id, user, role) => {
 
 export const updateOrder = async (id, user, role, state) => {
   try {
+    // Only an admin can update any order, a user can update only his orders
     const filter =
       user && role === "User" ? { ordered_by: user, uuid: id } : { uuid: id };
     const order = await Order.findOneAndUpdate(filter, { $set: { state } });
