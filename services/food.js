@@ -109,6 +109,20 @@ export const addCategory = async (body) => {
   }
 };
 
+export const getCategories = async (next) => {
+  try {
+    const categories = await Category.find({});
+    if (categories.length == 0) {
+      const error = new Error("Could not find any categories.");
+      error.status = 404;
+      return next(error);
+    }
+    return categories;
+  } catch (e) {
+    next(e);
+  }
+};
+
 export const addReview = async (id, user, body) => {
   try {
     const food = await Food.findOne({ uuid: id });

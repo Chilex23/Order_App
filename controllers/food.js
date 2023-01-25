@@ -12,6 +12,7 @@ import {
   editFood,
   deleteFood,
   addCategory,
+  getCategories,
   addReview,
   updateReview,
   getReviews,
@@ -60,6 +61,18 @@ export const addCategoryController = async (req, res, next) => {
     res.status(201).json({
       message: "Category added successfully",
       data: catgoryResult,
+      success: true,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+export const getCategoriesController = async (req, res, next) => {
+  try {
+    const categories = await getCategories(next);
+    return res.status(200).json({
+      categories,
       success: true,
     });
   } catch (e) {

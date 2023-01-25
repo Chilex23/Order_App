@@ -5,6 +5,7 @@ import { upload } from "../middleware/upload.js";
 import {
   addFoodController,
   addCategoryController,
+  getCategoriesController,
   updateFoodController,
   getAllFoodController,
   getFoodController,
@@ -20,6 +21,7 @@ export let router = express.Router();
 
 router.get("/", getAllFoodController);
 router.get("/:id", getFoodController);
+router.get("/category/all", getCategoriesController);
 router.get("/category/:category", getFoodsByCategoryController);
 
 router.use(passport.authenticate("jwt", { session: false }));
