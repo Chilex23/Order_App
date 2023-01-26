@@ -13,12 +13,19 @@ export const loginController = async (req, res, next) => {
         const body = {
           _id: user._id,
           username: user.username,
+          name: user.name,
           role: user.role,
         };
         const token = signToken({ user: body });
         return res
           .status(200)
-          .json({ token, success: true, message: "Login successfull" });
+          .json({
+            token,
+            success: true,
+            username: user.username,
+            name: user.name,
+            message: "Login successfull",
+          });
       });
     } catch (e) {
       console.log("error", e);
@@ -40,14 +47,12 @@ export const signUpController = async (req, res, next) => {
         const { message } = err;
         return res.status(400).json({ message, success: false });
       }
-     
-      return res
-        .status(201)
-        .json({
-          message: "Signup successful, redirect to login page.",
-          user: user.username,
-          success: true,
-        });
+
+      return res.status(201).json({
+        message: "Signup successful, redirect to login page.",
+        user: user.username,
+        success: true,
+      });
     } catch (e) {
       next(e);
     }
