@@ -24,6 +24,7 @@ export const loginController = async (req, res, next) => {
             success: true,
             username: user.username,
             name: user.name,
+            role: user.role,
             message: "Login successfull",
           });
       });
