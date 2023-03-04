@@ -8,7 +8,15 @@ const OrderSchema = new Schema({
   order_date: { type: Date, default: Date.now() },
   state: { type: Number, default: 0 },
   total_price: Number,
-  items: [{ name: String, id: String, price: Number, quantity: Number }],
+  items: [
+    {
+      name: String,
+      id: String,
+      price: Number,
+      quantity: Number,
+      category: String,
+    },
+  ],
 });
 
 const Order = model("Order", OrderSchema);
