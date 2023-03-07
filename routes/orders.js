@@ -1,6 +1,5 @@
 import express from "express";
 import passport from "passport";
-import { restrictTo } from "../middleware/auth.js";
 import {
   createOrderController,
   getOrdersController,
