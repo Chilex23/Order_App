@@ -38,25 +38,28 @@ export const createOrderController = async (req, res, next) => {
   }
 };
 
-export const getUserOrdersController = async (req, res, next) => {
+export const getOrdersController = async (req, res, next) => {
   try {
     let pageNo = req.query.page;
-    let { user } = req.params;
+    if (pageNo <= 0 || /\D{1,}/.test(pageNo))
+      return res.status(400).json({
+        message:
+          "The page query parameter must be greater than 0 and must be a number",
+      });
+    let { username } = req.user;
+    let { role } = req.user;
     let sortFormat = req.query.sort;
+    let reqUser = role === "Admin" ? null : username;
     const { orders, totalOrders, currentPage, totalPages } = await getOrders(
       pageNo,
-      user,
+      reqUser,
       sortFormat,
       next
     );
-    // Only users can view their orders
-    if (req.user.username !== user)
-      return res
-        .status(401)
-        .json({ message: "You can't view this order", success: false });
     if (!orders || orders.length == 0)
       return res.status(400).json({
-        message: "Bad Request, check the username or the query parameter 'page'.",
+        message:
+          "Bad Request, check the username or the query parameter 'page'.",
         success: false,
       });
     return res
@@ -68,39 +71,10 @@ export const getUserOrdersController = async (req, res, next) => {
   }
 };
 
-// GET ALL ORDERS FO USER WITH ADMIN PRIVILEGES
-export const getAllOrderController = async (req, res, next) => {
-  try {
-    let pageNo = req.query.page;
-    if (pageNo <= 0 || /\D{1,}/.test(pageNo))
-      return res.status(400).json({
-        message:
-          "The page query parameter must be greater than 0 and must be a number",
-      });
-    let sortFormat = req.query.sort;
-    const { orders, totalOrders, currentPage, totalPages } = await getOrders(
-      pageNo,
-      null,
-      sortFormat,
-      next
-    );
-    if (!orders || orders.length == 0)
-      return res.status(400).json({
-        message: "Bad Request, No query parameter for page.",
-        success: false,
-      });
-    return res
-      .status(200)
-      .json({ orders, totalOrders, currentPage, totalPages, success: true });
-  } catch (e) {
-    next(e);
-  }
-};
-
 // GET A PARTICULAR ORDER
 export const getOrderController = async (req, res, next) => {
   try {
-    let id = req.query.id;
+    let { id } = req.params;
     if (!id)
       return res.status(400).json({
         message: "Bad Request, No query parameter for id.",
